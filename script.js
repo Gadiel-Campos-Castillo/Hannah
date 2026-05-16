@@ -3,8 +3,8 @@ const ctx = canvas.getContext('2d');
 const startScreen = document.getElementById('start-screen');
 
 // Configuración de resolución virtual interna (Mantiene la lógica original)
-const WIDTH = 800;
-const HEIGHT = 500;
+const WIDTH = 1920;
+const HEIGHT = 1080;
 
 // Colores
 const WHITE = "#FFFFFF";
