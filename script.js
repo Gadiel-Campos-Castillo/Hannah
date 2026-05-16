@@ -278,3 +278,16 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop);
 }
+
+// Detectar si el usuario sale de la pestaña o minimiza el navegador
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        // Si el usuario salió de la app o cambió de pestaña, pausamos la música
+        musica.pause();
+    } else {
+        // Si regresa, solo reanudamos la música si NO estaba silenciada con el botón
+        if (!musica_silenciada) {
+            musica.play().catch(err => console.log("Error al reanudar audio:", err));
+        }
+    }
+});
