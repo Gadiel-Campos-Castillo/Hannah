@@ -2,7 +2,7 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const startScreen = document.getElementById('start-screen');
 
-// Configuración de resolución virtual interna (Mantiene la lógica original)
+// Configuración de resolución nativa en Alta Definición (16:9)
 const WIDTH = 1920;
 const HEIGHT = 1080;
 
@@ -16,7 +16,7 @@ const RED = "#D53930";
 const texto = "Perdón por desaparecer todo el día...";
 const texto2 = "No quería ignorarte :( ";
 const texto3 = "Hannah es la mejor de todo el mundo, ¡Miau!";
-const texto4 = "Maquina de Touring - 2026";
+const texto4 = "Maquina de Turing - 2026";
 
 // Estados lógicos
 let perdonado = false;
@@ -37,10 +37,10 @@ let texto4_index = 0;
 let ultimo_update = performance.now();
 const delay = 70; 
 
-// Posiciones lógicas de los botones
-const button_rect = { x: 390 - 110, y: 380 - 40, w: 220, h: 80 }; 
-const si_rect = { x: 280, y: 260, w: 100, h: 50 };
-const no_rect = { x: 420, y: 260, w: 100, h: 50 };
+// Posiciones lógicas de los botones escaladas a 1920x1080
+const button_rect = { x: 710, y: 730, w: 500, h: 180 }; 
+const si_rect = { x: 670, y: 560, w: 240, h: 110 };
+const no_rect = { x: 1010, y: 560, w: 240, h: 110 };
 
 // Cosas para el gracias
 let gracias_alpha = 0;
@@ -79,11 +79,11 @@ startScreen.addEventListener('click', () => {
     }, 500);
 });
 
-// Manejo de eventos de Click con escalado de coordenadas para Fullscreen
+// Manejo de eventos de Click con escalado de coordenadas exactas para 1920x1080
 canvas.addEventListener('mousedown', (event) => {
     const rect = canvas.getBoundingClientRect();
     
-    // IMPORTANTE: Escalamos la posición real del clic a nuestro espacio virtual de 800x500
+    // Escalamos la posición del clic físico del monitor al lienzo virtual de 1920x1080
     const mouseX = (event.clientX - rect.left) * (WIDTH / rect.width);
     const mouseY = (event.clientY - rect.top) * (HEIGHT / rect.height);
 
@@ -114,7 +114,7 @@ function colisionObjeto(mx, my, rect) {
 function gameLoop() {
     const ahora = performance.now();
 
-    // Renderizamos siempre sobre el lienzo virtual de 800x500
+    // Renderizado en 1920x1080
     ctx.drawImage(background, 0, 0, WIDTH, HEIGHT);
 
     // Lógica de máquina de escribir
@@ -150,58 +150,60 @@ function gameLoop() {
         }
     }
 
-    // Dibujar textos
+    // Dibujar textos principales (Tamaño y posiciones escaladas)
     ctx.fillStyle = WHITE;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    ctx.font = "36px 'CustomFont', sans-serif";
-    ctx.fillText(texto_visible, WIDTH / 2, 110);
-    ctx.fillText(texto3_visible, WIDTH / 2, 110);
+    ctx.font = "80px 'CustomFont', sans-serif";
+    ctx.fillText(texto_visible, WIDTH / 2, 240);
+    ctx.fillText(texto3_visible, WIDTH / 2, 240);
 
-    ctx.font = "26px 'CustomFont', sans-serif";
-    ctx.fillText(texto2_visible, WIDTH / 2, 170);
-    ctx.fillText(texto4_visible, WIDTH / 2, 170);
+    ctx.font = "55px 'CustomFont', sans-serif";
+    ctx.fillText(texto2_visible, WIDTH / 2, 370);
+    ctx.fillText(texto4_visible, WIDTH / 2, 370);
 
     // Botón Principal
     if (mostrar_boton) {
         ctx.drawImage(button_image, button_rect.x, button_rect.y, button_rect.w, button_rect.h);
         ctx.fillStyle = WHITE;
-        ctx.font = "26px 'CustomFont', sans-serif";
+        ctx.font = "55px 'CustomFont', sans-serif";
         ctx.fillText("¿Me perdonas?", button_rect.x + button_rect.w / 2, button_rect.y + button_rect.h / 2);
     }
 
-    // Pop-up de confirmación
+    // Pop-up de confirmación en Full HD
     if (mostrar_confirmacion) {
         ctx.fillStyle = "rgba(255, 182, 193, 0.47)";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
         ctx.fillStyle = PINK;
         ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(200, 150, 400, 200, 20);
-        else ctx.rect(200, 150, 400, 200);
+        if (ctx.roundRect) ctx.roundRect(480, 324, 960, 432, 45);
+        else ctx.rect(480, 324, 960, 432);
         ctx.fill();
 
         ctx.fillStyle = BLACK;
-        ctx.font = "26px 'CustomFont', sans-serif";
-        ctx.fillText("¿De verdad me perdonas?", 400, 190);
+        ctx.font = "60px 'CustomFont', sans-serif";
+        ctx.fillText("¿De verdad me perdonas?", 960, 430);
 
         // Sí
         ctx.fillStyle = "rgb(150, 255, 150)";
         ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(si_rect.x, si_rect.y, si_rect.w, si_rect.h, 10);
+        if (ctx.roundRect) ctx.roundRect(si_rect.x, si_rect.y, si_rect.w, si_rect.h, 20);
         else ctx.rect(si_rect.x, si_rect.y, si_rect.w, si_rect.h);
         ctx.fill();
         ctx.fillStyle = BLACK;
+        ctx.font = "50px 'CustomFont', sans-serif";
         ctx.fillText("Sí", si_rect.x + si_rect.w / 2, si_rect.y + si_rect.h / 2);
 
         // No
         ctx.fillStyle = RED;
         ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(no_rect.x, no_rect.y, no_rect.w, no_rect.h, 10);
+        if (ctx.roundRect) ctx.roundRect(no_rect.x, no_rect.y, no_rect.w, no_rect.h, 20);
         else ctx.rect(no_rect.x, no_rect.y, no_rect.w, no_rect.h);
         ctx.fill();
         ctx.fillStyle = BLACK;
+        ctx.font = "50px 'CustomFont', sans-serif";
         ctx.fillText("No", no_rect.x + no_rect.w / 2, no_rect.y + no_rect.h / 2);
     }
 
@@ -212,20 +214,20 @@ function gameLoop() {
 
         ctx.save();
         ctx.globalAlpha = gracias_alpha;
-        ctx.translate(WIDTH / 2, 260);
+        ctx.translate(WIDTH / 2, 560);
         ctx.scale(gracias_scale, gracias_scale);
 
         ctx.fillStyle = WHITE;
-        ctx.font = "36px 'CustomFont', sans-serif";
+        ctx.font = "80px 'CustomFont', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("Gracias", 0, 0);
 
         const anchoTexto = ctx.measureText("Gracias").width;
-        ctx.drawImage(heart, (anchoTexto / 2) + 10, -20, 40, 40);
+        ctx.drawImage(heart, (anchoTexto / 2) + 20, -45, 90, 90);
         ctx.restore();
 
-        // Gato animado
+        // Gato animado a escala Full HD
         cat_frame_index += cat_animation_speed;
         if (cat_frame_index >= catFrames.length) {
             cat_frame_index = 0;
@@ -233,7 +235,7 @@ function gameLoop() {
         const current_cat = catFrames[Math.floor(cat_frame_index)];
         
         if (current_cat && current_cat.complete && current_cat.naturalWidth !== 0) {
-            ctx.drawImage(current_cat, 320, 300, 150, 150);
+            ctx.drawImage(current_cat, 780, 640, 360, 360);
         }
     }
 

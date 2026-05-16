@@ -10,7 +10,7 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: #1a1a1a;
+    background-color: #1a1a1a; /* Fondo oscuro para los bordes que sobren en el cel */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,22 +25,33 @@ html, body {
     height: 100vh;
     background-color: #ffb6c1; /* PINK */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     color: white;
     font-family: 'CustomFont', sans-serif;
-    font-size: 32px;
+    font-size: 28px;
     text-align: center;
     z-index: 10;
     transition: opacity 0.5s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Pequeña nota en la pantalla de inicio para móviles */
+#start-screen::after {
+    content: "🔄 Para una mejor experiencia, gira tu pantalla";
+    font-size: 16px;
+    margin-top: 15px;
+    opacity: 0.8;
 }
 
 canvas {
-    width: 100vw;
-    height: 100vh;
     display: block;
-    /* Puedes usar 'object-fit: contain' si quieres mantener la relación de aspecto con barras negras a los lados, 
-       o dejarlo por defecto si prefieres que se estire por completo en cualquier pantalla */
-    object-fit: fill; 
+    /* Ajuste clave: mantiene la proporción exacta de tu juego de Pygame */
+    max-width: 100vw;
+    max-height: 100vh;
+    aspect-ratio: 1920 / 1080; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
