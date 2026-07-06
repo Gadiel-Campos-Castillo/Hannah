@@ -175,11 +175,11 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
     
     // Dejamos un estándar responsivo cómodo para todos
-    sueloY = canvas.height - (canvas.height*0.16);
+    sueloY = canvas.height - (canvas.height*0.14);
     
     // Ajuste de escala intermedio que se ve bien en laptops y móviles
     const anchoPantalla = window.innerWidth;
-    escalaMobile = anchoPantalla < 768 ? 0.6 : 0.70; 
+    escalaMobile = anchoPantalla < 768 ? 0.3 : 1.5; 
 
     personaje.width = 96 * escalaMobile;  
     personaje.height = 96 * escalaMobile; 
