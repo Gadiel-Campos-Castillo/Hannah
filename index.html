@@ -126,7 +126,7 @@ const demoVideo = document.getElementById('demoVideo');
 const htmlModal = document.getElementById('htmlModal');
 const hannahIframe = document.getElementById('hannahIframe');
 
-const RUTA_PAGINA_HANNAH = "index.html"; 
+const RUTA_PAGINA_HANNAH = "main.html"; 
 
 // Carga de la Imagen de Fondo
 const backgroundImage = new Image();
@@ -179,7 +179,7 @@ function resizeCanvas() {
     
     // Ajuste de escala intermedio que se ve bien en laptops y móviles
     const anchoPantalla = window.innerWidth;
-    escalaMobile = anchoPantalla < 768 ? 0.3 : 1.5; 
+    escalaMobile = anchoPantalla < 768 ? 0.6 : 0.85; 
 
     personaje.width = 96 * escalaMobile;  
     personaje.height = 96 * escalaMobile; 
