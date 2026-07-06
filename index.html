@@ -126,7 +126,7 @@ const demoVideo = document.getElementById('demoVideo');
 const htmlModal = document.getElementById('htmlModal');
 const hannahIframe = document.getElementById('hannahIframe');
 
-const RUTA_PAGINA_HANNAH = "main.html"; 
+const RUTA_PAGINA_HANNAH = "index.html"; 
 
 // Carga de la Imagen de Fondo
 const backgroundImage = new Image();
@@ -174,59 +174,47 @@ function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
-    // Si es móvil, definimos el suelo más cerca del borde inferior (ej. 60px)
-    // En computadora lo mantenemos a 100px
-    if (esMovil) {
-        sueloY = canvas.height - 60;
-        escalaMobile = 0.6; // Reducimos los elementos al 60% de su tamaño original
-    } else {
-        sueloY = canvas.height - 149; 
-        escalaMobile = 1.0;  // Tamaño normal en computadora
-    }
+    // Dejamos un estándar responsivo cómodo para todos
+    sueloY = canvas.height - 148;
     
-    // --- ESCALAR DINÁMICAMENTE AL PERSONAJE ---
-    // Ajustamos su ancho y alto en pantalla según el dispositivo
+    // Ajuste de escala intermedio que se ve bien en laptops y móviles
+    const anchoPantalla = window.innerWidth;
+    escalaMobile = anchoPantalla < 768 ? 0.6 : 0.85; 
+
     personaje.width = 96 * escalaMobile;  
     personaje.height = 96 * escalaMobile; 
 
-    // --- ESCALAR DINÁMICAMENTE LOS PORTALES ---
     portals.forEach(portal => {
         portal.width = 140 * escalaMobile;
         portal.height = 200 * escalaMobile;
     });
     
-    // --- CORRECCIÓN DEL PERSONAJE FLOTANDO ---
-    // Forzamos al jugador a actualizar de inmediato su posición Y interna
     personaje.sueloY = sueloY - personaje.height;
-    
-    // Si no está ejecutando un salto, lo anclamos firmemente al suelo recalculado
     if (!personaje.isJumping) {
         personaje.y = personaje.sueloY;
-        personaje.dy = 0; // Reseteamos cualquier fuerza de gravedad acumulada
+        personaje.dy = 0;
     }
 
-    // --- Reposicionar botones táctiles virtuales ---
-    if (esMovil) {
-        const altoBoton = 60;
-        const padding = 15;
-        
-        botonesTactiles.izq.w = 60; botonesTactiles.izq.h = 60;
-        botonesTactiles.der.w = 60; botonesTactiles.der.h = 60;
-        botonesTactiles.saltar.w = 75; botonesTactiles.saltar.h = 60;
-        botonesTactiles.entrar.w = 65; botonesTactiles.entrar.h = 60;
+    // --- Botones Virtuales Disponibles para Todos ---
+    const altoBoton = 55;
+    const padding = 20;
+    
+    botonesTactiles.izq.w = 60; botonesTactiles.izq.h = 55;
+    botonesTactiles.der.w = 60; botonesTactiles.der.h = 55;
+    botonesTactiles.saltar.w = 80; botonesTactiles.saltar.h = 55;
+    botonesTactiles.entrar.w = 65; botonesTactiles.entrar.h = 55;
 
-        botonesTactiles.izq.x = padding;
-        botonesTactiles.izq.y = canvas.height - altoBoton - padding;
-        
-        botonesTactiles.der.x = padding + 75;
-        botonesTactiles.der.y = canvas.height - altoBoton - padding;
+    botonesTactiles.izq.x = padding;
+    botonesTactiles.izq.y = canvas.height - altoBoton - padding;
+    
+    botonesTactiles.der.x = padding + 70;
+    botonesTactiles.der.y = canvas.height - altoBoton - padding;
 
-        botonesTactiles.entrar.x = canvas.width - 155 - padding;
-        botonesTactiles.entrar.y = canvas.height - altoBoton - padding;
-        
-        botonesTactiles.saltar.x = canvas.width - 75 - padding;
-        botonesTactiles.saltar.y = canvas.height - altoBoton - padding;
-    }
+    botonesTactiles.entrar.x = canvas.width - 160 - padding;
+    botonesTactiles.entrar.y = canvas.height - altoBoton - padding;
+    
+    botonesTactiles.saltar.x = canvas.width - 80 - padding;
+    botonesTactiles.saltar.y = canvas.height - altoBoton - padding;
 }
 
 window.addEventListener('resize', resizeCanvas);
@@ -338,6 +326,37 @@ function closeHtmlModal() {
     hannahIframe.src = ""; 
 }
 
+
+// --- FUNCIÓN DE CONTROL COMPARTIDA ---
+function procesarAccionPresionada(clientX, clientY) {
+    if (inModal) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    if (evaluarToque(x, y, botonesTactiles.izq)) keys.left = true;
+    if (evaluarToque(x, y, botonesTactiles.der)) keys.right = true;
+    if (evaluarToque(x, y, botonesTactiles.saltar)) keys.jump = true;
+    if (evaluarToque(x, y, botonesTactiles.entrar)) checkInteractions();
+}
+
+function procesarAccionSoltada() {
+    keys.left = false;
+    keys.right = false;
+    keys.jump = false;
+}
+
+// Eventos para Computadoras (Mac/Windows) usando el Mouse o Trackpad
+canvas.addEventListener('mousedown', (e) => procesarAccionPresionada(e.clientX, e.clientY));
+canvas.addEventListener('mouseup', procesarAccionSoltada);
+
+// Eventos para Celulares (Android/iOS) usando la pantalla táctil
+canvas.addEventListener('touchstart', (e) => {
+    const toque = e.touches[0];
+    procesarAccionPresionada(toque.clientX, toque.clientY);
+});
+canvas.addEventListener('touchend', procesarAccionSoltada);
+
 // Inicialización de dimensiones antes de arrancar
 resizeCanvas();
 
@@ -398,13 +417,12 @@ function render() {
         ctx.fillText(portal.label, portal.x + portal.width / 2, portal.y - 12);
     });
 
-    // 2.5 Dibujar controles virtuales si está en Android/iOS
-    if (esMovil && !inModal) {
+    // Dibujar controles visuales en pantalla (ayuda a guiar al usuario en Mac y Celulares)
+    if (!inModal) {
         ctx.save();
         Object.values(botonesTactiles).forEach(boton => {
-            // Fondo del botón translúcido
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
             ctx.lineWidth = 2;
             
             ctx.beginPath();
@@ -412,9 +430,8 @@ function render() {
             ctx.fill();
             ctx.stroke();
 
-            // Texto del botón
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 18px sans-serif';
+            ctx.font = 'bold 16px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(boton.label, boton.x + boton.w / 2, boton.y + boton.h / 2);
